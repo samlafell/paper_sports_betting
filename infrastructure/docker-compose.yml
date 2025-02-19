@@ -1,0 +1,41 @@
+version: '3.8'
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile  # You'll need to create Dockerfiles
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=sqlite:///./paper_betting.db # Or a different database
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+    depends_on:
+      - backend
+    environment:
+      - NEXT_PUBLIC_API_BASE_URL=http://localhost:8000 # Or your backend URL
+
+  db:  # Add a database service (e.g., PostgreSQL, MySQL)
+      image: postgres:14 # Example using PostgreSQL
+      ports:
+          - "5432:5432"
+      environment:
+          POSTGRES_USER: youruser
+          POSTGRES_PASSWORD: yourpassword
+          POSTGRES_DB: yourdb
+      volumes:
+          - postgres_data:/var/lib/postgresql/data
+
+volumes:
+    postgres_data: 
